@@ -1,10 +1,19 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Router } from 'express';
+import db from "../database.js";
 
 const router = Router();
 
 router.get('/', (req, res) => {
-    return res.send(Object.values(req.context.models.topics));
+    var sql = "select * from topics"
+    var params = []
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+            res.status(400).json({"error": err.message});
+            return;
+        }
+        res.json(rows)
+    });
 });
 
 router.get('/:topicId', (req, res) => {

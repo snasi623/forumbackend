@@ -1,17 +1,22 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Router } from 'express';
+import db from "../database.js";
 
 const router = Router();
 
-router.get('/', (req, res) => {
-    return res.send(Object.values(req.context.models.posts));
+router.get('/byTopicId/:topicId', (req, res) => {
+    var sql = "select * from posts where topicId = " + req.params.topicId
+    var params = []
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+            res.status(400).json({"error": err.message});
+            return;
+        }
+        res.json(rows)
+    });
 });
 
-router.get('/:postId', (req, res) => {
-    return res.send(req.context.models.posts[req.params.postId]);
-});
-
-router.post('/', (req, res) => {
+router.post('/byTopicId/:topicId', (req, res) => {
     const id = uuidv4();
     const post = {
         id,

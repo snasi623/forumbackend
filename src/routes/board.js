@@ -1,25 +1,34 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Router } from 'express';
+import db from "../database.js";
 
 const router = Router();
 
 router.get('/', (req, res) => {
-    return res.send(Object.values(req.context.models.boards));
-});
-
-router.get('/:boardId', (req, res) => {
-    return res.send(req.context.models.boards[req.params.boardId]);
+    var sql = "select * from boards"
+    var params = []
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+            res.status(400).json({"error": err.message});
+            return;
+        }
+        res.json(rows)
+    });
 });
 
 router.post('/', (req, res) => {
     const id = uuidv4();
-    const board = {
-        id,
-        text: req.body.text,
-        userId: req.context.me.id,
-    };
+    const board = JSON.parse(req.body);
 
-    req.context.models.boards[id] = board;
+    var sql = 'INSERT INTO board (boardName, description) VALUES (?,?)'
+    var params = [board.boardName, board.description]
+    db.run(sql, params, function (err, result) {
+        if (err) {
+            res.status(400).json({"error": err.message})
+            return;
+        }
+        res.json(result)
+    });
 
     return res.send(board);
 });
