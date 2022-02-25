@@ -18,19 +18,18 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     const id = uuidv4();
-    const board = JSON.parse(req.body);
+    const board = req.body;
+    console.log(board)
 
-    var sql = 'INSERT INTO board (boardName, description) VALUES (?,?)'
+    var sql = 'INSERT INTO boards (boardName, description) VALUES (?,?)'
     var params = [board.boardName, board.description]
     db.run(sql, params, function (err, result) {
         if (err) {
-            res.status(400).json({"error": err.message})
-            return;
+            res.json({"error": err.message})
+        } else {
+            res.json(result)
         }
-        res.json(result)
     });
-
-    return res.send(board);
 });
 
 router.delete('/:boardId', (req, res) => {
