@@ -21,16 +21,18 @@ router.get('/:topicId', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    const id = uuidv4();
-    const topic = {
-        id,
-        text: req.body.text,
-        userId: req.context.me.id,
-    };
+    const topic = req.body;
+    console.log(topic)
 
-    req.context.models.topics[id] = topic;
-
-    return res.send(topic);
+    var sql = 'INSERT INTO topics (boardId, threadName, firstPost, createdDate, userId) VALUES (?,?,?,?,?)'
+    var params = [topic.boardId, topic.threadName, topic.firstPost, new Date(), 1]
+    db.run(sql, params, function (err, result) {
+        if (err) {
+            res.status(500).json({"error": err.message})
+        } else {
+            res.json(result)
+        }
+    });
 });
 
 router.delete('/:topicId', (req, res) => {

@@ -20,7 +20,7 @@ var schema = [
 	"boardId"	INTEGER NOT NULL,
 	"createdDate"	INTEGER NOT NULL,
 	"userId"	INTEGER NOT NULL,
-	"firstPostId"	INTEGER NOT NULL,
+	"firstPost"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );`,
 `CREATE TABLE IF NOT EXISTS "posts" (
