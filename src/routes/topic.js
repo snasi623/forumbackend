@@ -4,9 +4,21 @@ import db from "../database.js";
 
 const router = Router();
 
-router.get('/', (req, res) => {
-    var sql = "select * from topics"
-    var params = []
+router.get('/:topicId', (req, res) => {
+    var sql = "select * from topics where id = ?"
+    var params = [req.params.topicId]
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+            res.status(400).json({"error": err.message});
+            return;
+        }
+        res.json(rows[0])
+    });
+});
+
+router.get('/byBoardId/:boardId', (req, res) => {
+    var sql = "select * from topics where boardId = ?"
+    var params = [req.params.boardId]
     db.all(sql, params, (err, rows) => {
         if (err) {
             res.status(400).json({"error": err.message});
@@ -14,10 +26,6 @@ router.get('/', (req, res) => {
         }
         res.json(rows)
     });
-});
-
-router.get('/:topicId', (req, res) => {
-    return res.send(req.context.models.topics[req.params.topicId]);
 });
 
 router.post('/', (req, res) => {

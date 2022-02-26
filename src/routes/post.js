@@ -16,17 +16,19 @@ router.get('/byTopicId/:topicId', (req, res) => {
     });
 });
 
-router.post('/byTopicId/:topicId', (req, res) => {
-    const id = uuidv4();
-    const post = {
-        id,
-        text: req.body.text,
-        userId: req.context.me.id,
-    };
+router.post('/', (req, res) => {
+    const post = req.body;
+    console.log(post)
 
-    req.context.models.posts[id] = post;
-
-    return res.send(post);
+    var sql = 'INSERT INTO posts (topicId, text, postDate, userId) VALUES (?,?,?,?)'
+    var params = [post.topicId, post.text, new Date(), 1]
+    db.run(sql, params, function (err, result) {
+        if (err) {
+            res.status(500).json({"error": err.message})
+        } else {
+            res.json(result)
+        }
+    });
 });
 
 router.delete('/:postId', (req, res) => {
