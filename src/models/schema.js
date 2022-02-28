@@ -30,6 +30,13 @@ var schema = [
 	"userId"	INTEGER NOT NULL,
 	"postDate"	INTEGER NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
+);`,
+`CREATE TABLE "sessions" (
+	"id"	TEXT,
+	"userId"	INTEGER,
+	"expiresOn"	INTEGER,
+	"startedOn"	INTEGER,
+	PRIMARY KEY("id")
 );`
 
 ]
