@@ -8,7 +8,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/session', routes.session);
 app.use('/user', routes.user);
 app.use('/post', routes.post);
 app.use('/board', routes.board);

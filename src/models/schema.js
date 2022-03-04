@@ -31,7 +31,7 @@ var schema = [
 	"postDate"	INTEGER NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );`,
-`CREATE TABLE "sessions" (
+`CREATE TABLE IF NOT EXISTS "sessions" (
 	"id"	TEXT,
 	"userId"	INTEGER,
 	"expiresOn"	INTEGER,

@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Router } from 'express';
 import db from "../database.js";
+import { checkSession } from "../util.js";
 
 const router = Router();
 
@@ -29,18 +30,23 @@ router.get('/:boardId', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    const board = req.body;
-    console.log(board)
+    checkSession(req.get("X-Forum-Session-Id") ?? "").then(r => {
+        const board = req.body;
+        console.log(board)
 
-    var sql = 'INSERT INTO boards (boardName, description) VALUES (?,?)'
-    var params = [board.boardName, board.description]
-    db.run(sql, params, function (err, result) {
-        if (err) {
-            res.status(500).json({"error": err.message})
-        } else {
-            res.json(result)
-        }
-    });
+        var sql = 'INSERT INTO boards (boardName, description) VALUES (?,?)'
+        var params = [board.boardName, board.description]
+        db.run(sql, params, function (err, result) {
+            if (err) {
+                res.status(500).json({"error": err.message})
+            } else {
+                res.json(result)
+            }
+        });
+    }).catch(r => {
+        console.log(r)
+        res.status(500).json({"error": "Please log in."})
+    })
 });
 
 router.delete('/:boardId', (req, res) => {
