@@ -1,7 +1,8 @@
 import db from "./database.js";
 
-function checkSession(sessionId) {
+function checkSession(req) {
     return new Promise((resolve, reject) => {
+        var sessionId = req.get("X-Forum-Session-Id") ?? ""
         var checkUserSql = "SELECT * FROM sessions WHERE id = ?";
         var checkUserParams = [sessionId];
 
@@ -12,7 +13,10 @@ function checkSession(sessionId) {
             if (!result) {
                 return reject({"error": "Invalid session."})
             }
-            return resolve();
+            return resolve({
+                sessionId: sessionId,
+                userId: result.userId
+            });
         });
     })
 }

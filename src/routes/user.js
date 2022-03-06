@@ -18,9 +18,9 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/:userId', (req, res) => {
-    return res.send(req.context.models.users[req.params.userId]);
-});
+// router.get('/:userId', (req, res) => {
+//     return res.send(req.context.models.users[req.params.userId]);
+// });
 
 router.post('/', (req, res) => {
     const user = req.body;
@@ -69,7 +69,7 @@ router.post('/login', (req, res) => {
     var checkUserParams = [cleanEmail, encryptedPassword];
     var registerSql = 'INSERT INTO sessions (id, userId, startedOn, expiresOn) VALUES (?,?,?,?)'
     var sessionId = uuidv4();
-    var startedOn = new Date();
+    var startedOn = Date.now();
 
 
     db.get(checkUserSql, checkUserParams, function (err, result) {
@@ -93,10 +93,9 @@ router.post('/login', (req, res) => {
 });
 
 router.get('/me', (req, res) => {
-    const sessionId = req.get("X-Forum-Session-Id") ?? ""
-    checkSession(sessionId).then(r => {
+    checkSession(req).then(r => {
         var sql = 'SELECT u.id, u.username FROM sessions AS s LEFT JOIN users AS u ON (u.id = s.userId) WHERE s.id = ?'
-        var params = [sessionId]
+        var params = [r.sessionId]
         db.get(sql, params, function (err, result) {
             if (err) {
                 res.status(500).json({"error": err.message})
@@ -109,6 +108,43 @@ router.get('/me', (req, res) => {
     }).catch(r => {
         console.log(r)
         res.status(500).json({"error": "Please log in."})
-    })});
+    })
+});
+
+router.put('/me', (req, res) => {
+    checkSession(req).then(r => {
+        var sql = 'UPDATE users SET username = ?, password = ? WHERE id = ?'
+        var params = [r.userId]
+        db.run(sql, params, function (err, result) {
+            if (err) {
+                res.status(500).json({"error": err.message})
+            } else if (result) {
+                res.json(result)
+            } else {
+                res.status(500).json({"error": "Unsuccessful"})
+            }
+        });
+    }).catch(r => {
+        console.log(r)
+        res.status(500).json({"error": "Please log in."})
+    })
+});
+
+router.post('/logout', (req, res) => {
+    checkSession(req).then(r => {
+        var sql = 'DELETE FROM sessions WHERE id = ?'
+        var params = [r.sessionId]
+        db.run(sql, params, function (err, result) {
+            if (err) {
+                res.status(500).json({"error": err.message})
+            } else {
+                res.json({"success": true})
+            }
+        });
+    }).catch(r => {
+        console.log(r)
+        res.status(500).json({"error": "Please log in."})
+    })
+});
 
 export default router;

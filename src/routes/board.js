@@ -30,7 +30,7 @@ router.get('/:boardId', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    checkSession(req.get("X-Forum-Session-Id") ?? "").then(r => {
+    checkSession(req).then(r => {
         const board = req.body;
         console.log(board)
 

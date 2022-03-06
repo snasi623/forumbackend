@@ -1,11 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Router } from 'express';
 import db from "../database.js";
+import { checkSession } from "../util.js";
 
 const router = Router();
 
 router.get('/:topicId', (req, res) => {
-    var sql = "select * from topics where id = ?"
+    var sql = "SELECT t.*, u.username AS createdByUsername FROM topics AS t LEFT JOIN users AS u ON (u.id = t.userId) WHERE t.id = ?"
     var params = [req.params.topicId]
     db.all(sql, params, (err, rows) => {
         if (err) {
@@ -17,7 +18,7 @@ router.get('/:topicId', (req, res) => {
 });
 
 router.get('/byBoardId/:boardId', (req, res) => {
-    var sql = "select * from topics where boardId = ?"
+    var sql = "SELECT t.*, u.username AS createdByUsername FROM topics AS t LEFT JOIN users AS u ON (u.id = t.userId) WHERE t.boardId = ?"
     var params = [req.params.boardId]
     db.all(sql, params, (err, rows) => {
         if (err) {
@@ -29,18 +30,21 @@ router.get('/byBoardId/:boardId', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    const topic = req.body;
-    console.log(topic)
+    checkSession(req).then(r => {
+        const topic = req.body;
+        console.log(topic)
 
-    var sql = 'INSERT INTO topics (boardId, threadName, firstPost, createdDate, userId) VALUES (?,?,?,?,?)'
-    var params = [topic.boardId, topic.threadName, topic.firstPost, new Date(), 1]
-    db.run(sql, params, function (err, result) {
-        if (err) {
-            res.status(500).json({"error": err.message})
-        } else {
-            res.json(result)
-        }
-    });
+        var sql = 'INSERT INTO topics (boardId, threadName, firstPost, createdDate, userId) VALUES (?,?,?,?,?)'
+        var params = [topic.boardId, topic.threadName, topic.firstPost, Date.now(), r.userId]
+        db.run(sql, params, function (err, result) {
+            if (err) {
+                console.log(err)
+                res.status(500).json({"error": err.message})
+            } else {
+                res.json(result)
+            }
+        });
+    })
 });
 
 router.delete('/:topicId', (req, res) => {
