@@ -18,10 +18,6 @@ router.get('/', (req, res) => {
     });
 });
 
-// router.get('/:userId', (req, res) => {
-//     return res.send(req.context.models.users[req.params.userId]);
-// });
-
 router.post('/', (req, res) => {
     const user = req.body;
     var cleanUsername = user.username.trim();
@@ -71,7 +67,6 @@ router.post('/login', (req, res) => {
     var sessionId = uuidv4();
     var startedOn = Date.now();
 
-
     db.get(checkUserSql, checkUserParams, function (err, result) {
         if (err) {
             return res.status(500).json({"error": err.message})
@@ -113,8 +108,16 @@ router.get('/me', (req, res) => {
 
 router.put('/me', (req, res) => {
     checkSession(req).then(r => {
+        const user = req.body;
+        var cleanUsername = user.username.trim();
+        var encryptedPassword = crypto.createHash('sha256').update(user.password).digest('hex');
+
+        if (!cleanUsername || !encryptedPassword) {
+            return res.status(500).json({"error": "Username or password are empty."})
+        }
+
         var sql = 'UPDATE users SET username = ?, password = ? WHERE id = ?'
-        var params = [r.userId]
+        var params = [cleanUsername, encryptedPassword, r.userId]
         db.run(sql, params, function (err, result) {
             if (err) {
                 res.status(500).json({"error": err.message})
@@ -126,7 +129,7 @@ router.put('/me', (req, res) => {
         });
     }).catch(r => {
         console.log(r)
-        res.status(500).json({"error": "Please log in."})
+        res.status(500).json({"error": "There was an error."})
     })
 });
 
