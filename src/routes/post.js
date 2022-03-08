@@ -10,7 +10,7 @@ router.get('/byTopicId/:topicId', (req, res) => {
     var params = [req.params.topicId]
     db.all(sql, params, (err, rows) => {
         if (err) {
-            res.status(400).json({"error": err.message});
+            res.status(400).json({"error": err});
             return;
         }
         res.json(rows)
@@ -26,7 +26,7 @@ router.post('/', (req, res) => {
         var params = [post.topicId, post.text, Date.now(), r.userId]
         db.run(sql, params, function (err, result) {
             if (err) {
-                res.status(500).json({"error": err.message})
+                res.status(500).json({"error": err})
             } else {
                 res.json(result)
             }
@@ -40,7 +40,7 @@ router.delete('/:postId', (req, res) => {
         var params = [req.params.postId, r.userId]
         db.run(sql, params, function (err, result) {
             if (err) {
-                res.status(500).json({"error": err.message})
+                res.status(500).json({"error": err})
             } else {
                 res.json({"success": true})
             }

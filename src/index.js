@@ -24,7 +24,7 @@ app.listen(3001, () => {
         var params = [now]
         db.run(sql, params, function (err, result) {
             if (err) {
-                console.log("Session cleaner error: " + err.message)
+                console.log("Session cleaner error: " + err)
             } else {
                 console.log("Session cleaner was successful")
             }

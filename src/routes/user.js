@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
     var params = []
     db.all(sql, params, (err, rows) => {
         if (err) {
-            res.status(400).json({"error": err.message});
+            res.status(400).json({"error": err});
             return;
         }
         res.json(rows)
@@ -35,7 +35,7 @@ router.post('/', (req, res) => {
  
     db.get(checkUserSql, checkUserParams, function (err, result) {
         if (err) {
-            return res.status(500).json({"error": err.message})
+            return res.status(500).json({"error": err})
         }
         if (result) {
             return res.status(500).json({"error": "User already registered."})
@@ -43,7 +43,7 @@ router.post('/', (req, res) => {
 
         db.run(registerSql, registerParams, function (err) {
             if (err) {
-                return res.status(500).json({"error": err.message})
+                return res.status(500).json({"error": err})
             } else {
                 console.log("New User Registered: %s", cleanUsername)
                 return res.json({"username": cleanUsername})
@@ -69,7 +69,7 @@ router.post('/login', (req, res) => {
 
     db.get(checkUserSql, checkUserParams, function (err, result) {
         if (err) {
-            return res.status(500).json({"error": err.message})
+            return res.status(500).json({"error": err})
         }
         if (!result) {
             return res.status(500).json({"error": "Invalid username or password."})
@@ -78,7 +78,7 @@ router.post('/login', (req, res) => {
         var registerParams = [sessionId, result.id, startedOn, startedOn + (3600 * 1000)]
         db.get(registerSql, registerParams, function (err, result2) {
             if (err) {
-                return res.status(500).json({"error": err.message})
+                return res.status(500).json({"error": err})
             } else {
                 console.log("Session Started for User %s : %s", result.username, sessionId)
                 return res.json({"sessionId": sessionId, "userId": result.id})
@@ -93,7 +93,7 @@ router.get('/me', (req, res) => {
         var params = [r.sessionId]
         db.get(sql, params, function (err, result) {
             if (err) {
-                res.status(500).json({"error": err.message})
+                res.status(500).json({"error": err})
             } else if (result) {
                 res.json(result)
             } else {
@@ -120,7 +120,7 @@ router.put('/me', (req, res) => {
         var params = [cleanUsername, encryptedPassword, r.userId]
         db.run(sql, params, function (err, result) {
             if (err) {
-                res.status(500).json({"error": err.message})
+                res.status(500).json({"error": err})
             } else if (result) {
                 res.json(result)
             } else {
@@ -139,7 +139,7 @@ router.post('/logout', (req, res) => {
         var params = [r.sessionId]
         db.run(sql, params, function (err, result) {
             if (err) {
-                res.status(500).json({"error": err.message})
+                res.status(500).json({"error": err})
             } else {
                 res.json({"success": true})
             }

@@ -10,7 +10,7 @@ router.get('/:topicId', (req, res) => {
     var params = [req.params.topicId]
     db.all(sql, params, (err, rows) => {
         if (err) {
-            res.status(400).json({"error": err.message});
+            res.status(400).json({"error": err});
             return;
         }
         res.json(rows[0])
@@ -22,7 +22,7 @@ router.get('/byBoardId/:boardId', (req, res) => {
     var params = [req.params.boardId]
     db.all(sql, params, (err, rows) => {
         if (err) {
-            res.status(400).json({"error": err.message});
+            res.status(400).json({"error": err});
             return;
         }
         res.json(rows)
@@ -39,7 +39,7 @@ router.post('/', (req, res) => {
         db.run(sql, params, function (err, result) {
             if (err) {
                 console.log(err)
-                res.status(500).json({"error": err.message})
+                res.status(500).json({"error": err})
             } else {
                 res.json(result)
             }

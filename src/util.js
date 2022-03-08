@@ -8,7 +8,7 @@ function checkSession(req) {
 
         db.get(checkUserSql, checkUserParams, function (err, result) {
             if (err) {
-                return reject({"error": err.message})
+                return reject({"error": err})
             }
             if (!result) {
                 return reject({"error": "Invalid session."})
